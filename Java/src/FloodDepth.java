@@ -1,10 +1,13 @@
 /**
  * https://app.codility.com/programmers/trainings/1/flood_depth/
+ * @author 신영은
+ * <pre>
  * DP 활용
  * 맨 앞을 0으로 두고(끝이라 물 안고임)
  * 다음 칸이 현재 칸보다 낮으면 낮은 깊이만큼 물 높이 추가
  * 이걸 앞 뒤로 반복해서 더 얕은 물 높이로 설정
  * -> 시간복잡도 O(N)
+ * </pre>
  */
 
 class Solution {
