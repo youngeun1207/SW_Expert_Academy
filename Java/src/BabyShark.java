@@ -23,7 +23,6 @@ public class BabyShark {
     static int answer;
 
     public static void main(String[] args) throws IOException {
-        Scanner sc = new Scanner(System.in);
         N = Integer.parseInt(br.readLine());
 
         ocean = new int[N][N]; // 물고기 위치 저장
