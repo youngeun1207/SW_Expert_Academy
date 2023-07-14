@@ -3,12 +3,15 @@ import java.io.*;
 
 /**
  * 백준 16236 아기상어
- *
+ * https://www.acmicpc.net/problem/16236
+ * 
  * @author youngeun
- * <p>
+ * <pre>
  * BFS 사용
- * 가장 가까운 먹이 > 위 우선 > 왼쪽 우선 조건 충족을 위해 먹을 수 있는 물고기 모두 저장한 후 비교해서 최종 물고기 선정
- * 백준에서 메모리 초과 문제 떠서 아직 해결 못함ㅠㅠ
+ * BFS로 먹을 수 있는 먹이까지 가는데 걸리는 시간 구함
+ * 가장 가까운 먹이 > 위 우선 > 왼쪽 우선 조건 충족을 위해 먹을 수 있는 물고기를 비교해서 최종 물고기 선정
+ * 메모리 초과 방지를 위해 queue에서 pop할 때 visited 체크하는 것이 아닌 queue에 넣을 때 visited 체크함!!!
+ * </pre>
  */
 public class BabyShark {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -68,7 +71,7 @@ public class BabyShark {
     }
 
     public static Fish BFS() {
-        List<Fish> ate = new ArrayList<>(); // 먹을 수 있는 물고기 모음
+        Fish ate = new Fish(100000, 100000, 100000); // 먹을 수 있는 물고기 중 가장 우선순위 높은 물고기 저장
         boolean[][] visited = new boolean[N][N];
 
         while (!queue.isEmpty()) {
@@ -77,8 +80,6 @@ public class BabyShark {
             int nowY = current.y;
             int nowX = current.x;
 
-            visited[nowY][nowX] = true;
-
             for (int[] dir : dirs) {
                 int y = nowY + dir[0];
                 int x = nowX + dir[1];
@@ -86,25 +87,17 @@ public class BabyShark {
                     if (ocean[y][x] == 0 || ocean[y][x] == size) {
                         queue.offer(new Fish(time + 1, y, x));
                     } else if (ocean[y][x] < size) { // 먹을 수 있음
-                        ate.add(new Fish(time + 1, y, x));
+                    	Fish newFish = new Fish(time + 1, y, x);
+                    	ate = CompareFish(ate, newFish); // 가장 우선순위 높은 물고기로 변경
                     }
+                    visited[y][x] = true; // 여기서 방문 체크 해야 중복 방지로 메모리 초과 안됨!!!!
                 }
+                visited[nowY][nowX] = true;
             }
         }
-
-        if (!ate.isEmpty()) { // 먹을 수 있는 물고기가 있으면
-            ate.sort((a, b) -> { // 우선순위 순으로 정렬
-                if (a.distance != b.distance) { // 거리
-                    return Integer.compare(a.distance, b.distance);
-                } else if (a.y != b.y) { // 위 우선
-                    return Integer.compare(a.y, b.y);
-                } else { // 왼쪽 우선
-                    return Integer.compare(a.x, b.x);
-                }
-            });
-            Fish min = ate.get(0);
-            ocean[min.y][min.x] = 0;
-            return new Fish(min.distance, min.y, min.x); // 이동에 걸린 시간, 이동한 위치 반환
+        if (ate.y < N) { // 먹을 수 있는 물고기가 있으면
+            ocean[ate.y][ate.x] = 0;
+            return ate; // 이동에 걸린 시간, 이동한 위치 반환
         } else { // 먹을 수 있는 물고기가 없음 -> 엄마 불러
             return new Fish(-1, -1, -1);
         }
@@ -120,6 +113,28 @@ public class BabyShark {
             this.distance = distance;
             this.y = y;
             this.x = x;
+        }
+    }
+    
+    public static Fish CompareFish(Fish a, Fish b) {
+    	if (a.distance != b.distance) { // 거리
+    		if(a.distance > b.distance) {
+    			return b;
+    		}else {
+    			return a;
+    		}
+    	} else if (a.y != b.y) { // 위 우선
+    		if(a.y > b.y) {
+    			return b;
+    		}else {
+    			return a;
+    		}
+    	} else { // 왼쪽 우선
+    		if(a.x > b.x) {
+    			return b;
+    		}else {
+    			return a;
+    		}
         }
     }
 }
