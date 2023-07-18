@@ -7,6 +7,7 @@ import java.util.Scanner;
  * 백준 19236 청소년 상어
  * 삼성 SW 역량 테스트 기출
  * DFS + 단순구현
+ * Hash Map으로 물고기 위치 저장하여 지도 순회하지 않고도 순서대로 위치 이동 구현
  */
 class Fish {
     int r, c, dir;
@@ -19,6 +20,7 @@ class Fish {
         this.dead = false;
     }
     public Fish(int r, int c, int dir, boolean dead) {
+        // state 복사용 생성자
         this.r = r;
         this.c = c;
         this.dir = dir;
