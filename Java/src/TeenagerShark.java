@@ -3,6 +3,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
+ * @author youngeun
  * 백준 19236 청소년 상어
  * 삼성 SW 역량 테스트 기출
  * DFS + 단순구현
