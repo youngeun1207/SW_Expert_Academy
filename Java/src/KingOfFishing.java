@@ -101,8 +101,8 @@ public class KingOfFishing {
     static void moveShark(Shark shark) {
         int distance;
         if (shark.d < 2) { // 위, 아래 -> r 변경
-            distance = shark.s + shark.r;
-            shark.r = distance % cycleR.length;
+            distance = shark.s + shark.r; // 현재 상어 위치(cycle 내 index) + speed
+            shark.r = distance % cycleR.length; // cycle로 저장했기 때문에 나머지 연산하면 상어 위치 빠르게 구할 수 있음!
         } else { // 오른, 왼 -> c 변경
             distance = shark.s + shark.c;
             shark.c = distance % cycleC.length;
@@ -118,7 +118,7 @@ public class KingOfFishing {
                 int c = cycleC[shark.c];
                 if (sharkMap[r][c] == 0) { // 비어있는 경우
                     sharkMap[r][c] = shark.idx;
-                } else if (shark.z > sharkState.get(sharkMap[r][c]).z) { // 존 상어보다 큰 경우 -> 잡아먹기
+                } else if (shark.z > sharkState.get(sharkMap[r][c]).z) { // 기존 상어보다 큰 경우 -> 잡아먹기
                     sharkState.get(sharkMap[r][c]).dead = true;
                     sharkMap[r][c] = shark.idx;
                 } else { // 기존 상어보다 작은 경우 -> 잡아먹히기
