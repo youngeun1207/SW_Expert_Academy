@@ -5,7 +5,9 @@ import java.util.*;
  * BFS
  * @author youngeun
  *
- *
+ * 한 글자씩 비교해서 한 글자만 다른 단어는 queue에 넣기
+ * BFS 돌리기
+ * 중복해서 큐에 들어가지 않도록 단어 리스트 수정하기
  */
 class ChangeValue {
     public int solution(String begin, String target, String[] words) {
@@ -35,7 +37,7 @@ class ChangeValue {
                     }
                 }
                 if (cnt == target.length() - 1) { // 1글자 빼고 다 같은 단어는 queue에 삽입
-                    queue.offer(new Pair<>(words[i], idx + 1));
+                    queue.offer(new Pair<>(words[i], idx + 1)); // 연산 결과 +1
                     words[i] = "0"; // 중복해서 들어가지 않도록 단어 바꾸기 (visited 역할)
                 }
             }
