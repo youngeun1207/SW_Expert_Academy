@@ -1,11 +1,10 @@
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 /**
  * 백준 2615 오목
  * @author youngeun
  * 16108kb
- * 156ms
+ * 148ms
  * 
  * 단순구현
  * 6목 주의
@@ -35,10 +34,10 @@ public class Omok {
 							
 							if(0 <= newRow && 19 > newRow && 0 <= newCol && 19 > newCol) {
 								if(!grid[newRow][newCol].equals(prev)) {
-									break Move;
+									break;
 								}
 							}else {
-								break Move;
+								break;
 							}
 						}
 						if(i == 5) {
