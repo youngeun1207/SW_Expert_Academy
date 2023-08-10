@@ -22,9 +22,7 @@ import static java.lang.System.exit;
  *         ex) 1  ㅡ  2  1R -> 2B -> 3R -> 1R(같은 색!!) 이진 그래프 실패 -> 모든 경우 잡아먹힘
  *              \  /
  *                3
- *     3. 만약 이진그래프 만들 수 있으면
- *         a. 서로 다른 색 고르는 경우의 수 * 2(사자, 토끼 위치 바뀌어도 동일함)
- *         b. nC2 = (n * n-1) / 2
+ *     3. 만약 이진그래프 만들 수 있으면 -> 서로 다른 색 고르는 경우의 수 * 2(사자, 토끼 위치 바뀌어도 동일함)
  */
 public class LionAndRabbit {
     static Node[] nodes;
