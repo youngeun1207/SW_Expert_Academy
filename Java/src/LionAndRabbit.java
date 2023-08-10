@@ -42,6 +42,7 @@ public class LionAndRabbit {
         int v1, v2;
         Node node;
         nodes = new Node[N+1];
+        // 간선 정보 받기
         for(int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
             v1 = Integer.parseInt(st.nextToken());
@@ -54,29 +55,29 @@ public class LionAndRabbit {
                 node = new Node(v2);
                 nodes[v2] = node;
             }
+            // 양방항 간선 그래프이므로 양방향으로 저장
             nodes[v1].adj.add(v2);
             nodes[v2].adj.add(v1);
         }
         // dfs
         visited = new boolean[N+1];
+        // 1번 노드 방문체크 + 빨강으로 칠한 후 DFS 시작
         visited[1] = true;
         nodes[1].color = 'R';
         DFS(0, nodes[1]);
-        System.out.println(colorCnt[0] * colorCnt[1] * 2);
+
+        System.out.println(colorCnt[0] * colorCnt[1] * 2); // 서로 다른 색 고르는 경우의 수 * 2(사자, 토끼 위치 바뀌어도 동일함)
     }
 
     static void DFS(int prev, Node node) {
         int color;
-//        System.out.println(node.n + "===========");
         for(int adj : node.adj) {
-//            System.out.println(node.n + " " + adj + " " + node.color + " " + nodes[adj].color);
-            if(!visited[adj]) {
+            if(!visited[adj]) { // 만약 방문하지 않은 노드면 직전 노드와 다른 색으로 칠하기
                 visited[adj] = true;
                 color = (prev + 1)%2;
                 nodes[adj].color = colors[color];
                 colorCnt[color]++;
-                DFS(color, nodes[adj]);
-
+                DFS(color, nodes[adj]); // 해당 노드로 DFS 돌리기!
             }else if(nodes[adj].color == colors[prev]) { // 이분 그래프 아님!
                 System.out.println("0");
                 exit(0);
