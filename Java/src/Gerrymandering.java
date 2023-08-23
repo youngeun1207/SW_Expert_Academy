@@ -24,7 +24,7 @@ import java.util.StringTokenizer;
  * 	- 연결될 수 없는 노드면 out 
  * 	- 연결 가능한 노드로만 이루어지면, 서브트리 합 vs 전체-서브트리 차이 최솟값 갱신 
  */
-public class BJ_17471_게리맨더링_신영은 {
+public class Gerrymandering {
 	static int N;
 	static int answer = Integer.MAX_VALUE;
 	static int selected = 1, tmp = 0, total = 0;
