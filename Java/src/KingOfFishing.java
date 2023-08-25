@@ -1,141 +1,151 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+package ye;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 /**
  * 백준 17143 낚시왕
- * 삼성 SW 역량 테스트 기출
  * @author youngeun
  *
- * 메모리 75884 KB
- * 시간 1060 ms
+ * 23472 KB
+ * 288 ms
  *
- * 단순 구현 + 해싱 + 이동 거리 계산
+ * <단순구현>
+ * - 상어가 거꾸로 가는 경우(상, 좌) 인덱스를 일일히 교정하면 비효율적임
+ * - 모듈러 연산만으로 상어의 현재 위치 쉽게 구할 수 있도록 인덱스 사이클 배열을 생성
+ *     - 예) R=4 -> [0, 1, 2, 3, 2, 1]
+ *     - 상어 위치 최초 1회 교정 후에는 상행은 하행처럼, 좌행은 우행처럼 똑같이 쓸 수 있음
+ *     - 단, 지도에 상어 위치 저장 시에는 사이클 배열에 저장된 인덱스로 변경하기
  */
-
-class Shark {
-    int idx, r, c, s, d, z;
-    boolean dead;
-
-    public Shark(int idx, int r, int c, int s, int d, int z) {
-        this.idx = idx; // 상어 번호
-        this.r = r; // row
-        this.c = c; // col
-        this.s = s; // speed
-        this.d = d; // 이동 방향
-        this.z = z; // size
-        this.dead = false; // 상어 잡아먹히거나, 낚시꾼이 잡았을 때 true
-    }
-
-    @Override
-    public String toString() { // 디버깅용
-        String[] dirs = {"↑", "↓", "→", "←"};
-        return idx + "번 상어 r:" + r + " c:" + c + " dir:" + dirs[d] + " dead:" + dead;
-    }
-}
-
 public class KingOfFishing {
-    static int R, C, M;
-    static Map<Integer, Shark> sharkState;
-    static int[][] sharkMap;
-    static int answer = 0;
-    static int[] cycleR, cycleC;
-
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        R = scanner.nextInt();
-        C = scanner.nextInt();
-        M = scanner.nextInt();
-
-        sharkState = new HashMap<>(); // shark_map 순회 안하고도 상어 이동할 수 있도록 상어 위치와 상태 HashMap으로 저장(해싱)
-        sharkMap = new int[R][C]; // 2차원 배열 상의 상어 위치 -> 낚시 대상 상어 찾는 용으로 쓰임
-
-        // 왕복이므로 5칸이면 01234321 순으로 움직임
-        // 상어가 움직이는 상행, 하행 사이클 저장
-        cycleR = new int[2*R-2];
-        cycleC = new int[2*C-2];
-
-        for (int r = 0; r < R; r++) {
-            cycleR[r] = r;
+    static int R, C, M, answer = 0;
+    static Shark[] sharks;
+    static Shark[][] map;
+    static int[] rows, cols;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        R = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        // 사이클 만들기
+        rows = new int[R*2-2];
+        cols = new int[C*2-2];
+        for(int i = 0; i < R; i++) {
+            rows[i] = i;
         }
-        for (int r = 2; r < R; r++) {
-            cycleR[R + r - 2] = R - r;
+        int cnt = R-2;
+        for(int i = R; i < rows.length; i++) {
+            rows[i] = cnt--;
         }
-        for (int c = 0; c < C; c++) {
-            cycleC[c] = c;
+        for(int i = 0; i < C; i++) {
+            cols[i] = i;
         }
-        for (int c = 2; c < C; c++) {
-            cycleC[C + c - 2] = C - c;
+        cnt = C-2;
+        for(int i = C; i < cols.length; i++) {
+            cols[i] = cnt--;
         }
 
-        for (int m = 1; m < M+1; m++) {
-            int r = scanner.nextInt();
-            int c = scanner.nextInt();
-            int s = scanner.nextInt();
-            int d = scanner.nextInt();
-            int z = scanner.nextInt();
-
-            sharkMap[r-1][c-1] = m;
-            // 역방향(위, 왼쪽)일 경우 cycle에서의 index로 바꿔 저장해야함
-            if (d == 1) {
-                r = 2 * R - r;
-            } else if (d == 4) {
-                c = 2 * C - c;
-            }
-            sharkState.put(m, new Shark(m, r-1, c-1, s, d-1, z));
+        // 상어 정보 받기
+        sharks = new Shark[M];
+        map = new Shark[R][C];
+        for(int m = 0; m < M; m++) {
+            st = new StringTokenizer(br.readLine());
+            int r = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
+            Shark s = new Shark(r, c, Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+            sharks[m] = s;
+            map[r-1][c-1] = s;
         }
 
-        for (int c = 0; c < C; c++) {
-            getShark(c);
-            for (Shark shark : sharkState.values()) {
-                if (!shark.dead) { // 죽은 상어는 움직일 필요 없다
-                    moveShark(shark);
-                }
-            }
-            eatShark();
+        // 열 수 만큼 반복
+        for(int c = 0; c < C; c++) {
+            get(c); // 낚시
+            move(); // 상어 이동
+            eat(); // 상어끼리 잡아먹기
         }
 
         System.out.println(answer);
     }
 
-    static void moveShark(Shark shark) {
-        int distance;
-        if (shark.d < 2) { // 위, 아래 -> r 변경
-            distance = shark.s + shark.r; // 현재 상어 위치(cycle 내 index) + speed
-            shark.r = distance % cycleR.length; // cycle로 저장했기 때문에 나머지 연산하면 상어 위치 빠르게 구할 수 있음!
-        } else { // 오른, 왼 -> c 변경
-            distance = shark.s + shark.c;
-            shark.c = distance % cycleC.length;
+    /**
+     * 상어 이동
+     */
+    static void move() {
+        for(Shark s : sharks) {
+            if(s.dead) { // 죽은 상어
+                continue;
+            }
+
+            if(s.d <= 2) { // 세로 이동
+                s.r = (s.r+s.s) % rows.length;
+            }else { // 가로 이동
+                s.c = (s.c+s.s) % cols.length;
+            }
         }
     }
+    /**
+     * 상어 잡아먹기
+     */
+    static void eat() {
+        map = new Shark[R][C];
+        for(Shark s : sharks) {
+            if(s.dead) { // 죽은 상어
+                continue;
+            }
+            int row = rows[s.r]; // 실제 인덱스로 변경
+            int col = cols[s.c];
 
-    static void eatShark() {
-        sharkMap = new int[R][C]; // 상어끼리 잡아 먹은 후의 shark_map -> 초기화해서 사용함
-        for (Shark shark : sharkState.values()) {
-            if (!shark.dead) {
-                // shark 객체 내에는 cycle 내에서의 index 저장했기 때문에 실제 index로 변환
-                int r = cycleR[shark.r];
-                int c = cycleC[shark.c];
-                if (sharkMap[r][c] == 0) { // 비어있는 경우
-                    sharkMap[r][c] = shark.idx;
-                } else if (shark.z > sharkState.get(sharkMap[r][c]).z) { // 기존 상어보다 큰 경우 -> 잡아먹기
-                    sharkState.get(sharkMap[r][c]).dead = true;
-                    sharkMap[r][c] = shark.idx;
-                } else { // 기존 상어보다 작은 경우 -> 잡아먹히기
-                    shark.dead = true;
-                }
+            if (map[row][col] == null) { // 빈칸
+                map[row][col] = s;
+            }
+            else if(map[row][col].z < s.z) { // 내가 더 큼 -> 기존 상어 잡아먹기
+                map[row][col].dead = true;
+                map[row][col] = s; // 바꾸기
+            }
+            else { // 내가 더 작음 -> 잡아먹힘
+                s.dead = true;
             }
         }
     }
 
-    static void getShark(int idx) {
-        for (int r = 0; r < R; r++) {
-            if (sharkMap[r][idx] != 0) {
-                Shark shark = sharkState.get(sharkMap[r][idx]);
-                answer += shark.z;
-                shark.dead = true;
-                sharkMap[r][idx] = 0;
-                break; // 가장 가까운 상어 낚시하면 바로 반복문 탈출
+    /**
+     * 낚시왕이 상어 잡기
+     */
+    static void get(int col) {
+        for(int row = 0; row < R; row++) {
+            if(map[row][col] != null) {
+                map[row][col].dead = true;
+                answer+=map[row][col].z;
+                break; // 가장 가까운거 잡은 후에는 다음 열로 이동
+            }
+        }
+    }
+
+    static class Shark {
+        int r, c, s, d, z;
+        boolean dead = false;
+
+        public Shark(int r, int c, int s, int d, int z) {
+            this.r = r-1; // 행
+            this.c = c-1; // 열
+            this.s = s; // 속도
+            this.d = d; // 이동방향
+            this.z = z; // 크기
+
+            changeCoor();
+        }
+        /**
+         * 사이클에 해당하는 인덱스로 좌표 교정하기
+         * 거꾸로 가는 경우(상, 좌)에 해당
+         */
+        void changeCoor() {
+            if(this.d == 1) { // 상행 -> r 교정
+                this.r = rows.length - this.r;
+            }else if(this.d == 4) { // 좌행 -> c 교정
+                this.c = cols.length - this.c;
             }
         }
     }
