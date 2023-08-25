@@ -86,6 +86,7 @@ public class KingOfFishing {
             }
         }
     }
+
     /**
      * 상어 잡아먹기
      */
