@@ -85,7 +85,8 @@ public class MakeBridges2 {
         // Prim's algo
         boolean[] visitedNode = new boolean[10];
         int answer = 0;
-        PriorityQueue<Node> queue = new PriorityQueue<>(); // 최소 cost 간선 고르기 위해 내부적으로 minHeap 구현되어있는 priorityQueue 사용
+        // 최소 cost 간선 고르기 위해 내부적으로 minHeap 구현되어있는 priorityQueue 사용
+        PriorityQueue<Node> queue = new PriorityQueue<>();
         queue.add(new Node(0, 0));
         Node node;
         int cost, to;
