@@ -14,7 +14,9 @@ import java.util.StringTokenizer;
  * <DP + skack>
  * 각 열마다 돌을 던졌을 때 가능한 위치 스택에 저장함
  * 1. 만약 스택에 경로 없으면 -> 맨 윗 줄에서 바로 move()
- * 2. 스택에 경로 있으면 -> pop 하면서 해당 지점이 돌(O)이면 그 경로 꽉 찬 것이므로 다음 경로 찾기
+ * 2. 스택에 경로 있으면
+ *  a. pop한 지점이 빈칸(.)이면 해당 지점부터 탐색(move())
+ *  b. pop한 지점이 돌(O)이면 그 경로 꽉 찬 것이므로 새로 pop 해서 위로 올라가기(이전 경로 지점으로)
  * 3. move()
  *  아래 로직 수행하기 전에 현재 도달한 지점 경로에 push
  *  a. 빈 칸이면(.) 바로 한 줄 밑으로
@@ -65,7 +67,7 @@ public class ThrowStone {
                     break;
                 }
             }
-            // 돌 양 옆으로 구르기
+            // 가능한 경로부터 떨어지기
             if (!dp[col].isEmpty()) {
                 coor = dp[col].pop();
             }
@@ -104,7 +106,7 @@ public class ThrowStone {
                 return;
             }
 
-            // 돌 만남
+            // 돌 만남 -> 양 옆으로 구르기
             if(map[r+1][c] == 'O'){
                 // 왼쪽
                 if(isInRange(r, c-1) && isInRange(r+1, c-1)){
