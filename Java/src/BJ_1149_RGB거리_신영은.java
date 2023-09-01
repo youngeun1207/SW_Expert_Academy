@@ -21,7 +21,7 @@ import java.util.StringTokenizer;
  * 종료 후 min(dp[N-1])이 최소 비용
  * 
  */
-public class 백준_1149_RGB거리_신영은 {
+public class BJ_1149_RGB거리_신영은 {
 	static int N;
 	static int[][] dp;
 	public static void main(String[] args) throws NumberFormatException, IOException {
